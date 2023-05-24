@@ -1,20 +1,26 @@
 .data
 	Message:	.asciiz	"Nhap so nguyen:"
-	hex_result:	.asciiz "Hexadecimal result: "
+	Title:		.asciiz "i	power(2,i)	square(i)	Hexadecimal(i)\n"
+	space:		.asciiz "	"
+	digit:		.asciiz "0123456789ABCDEF"
+	hex_result:	.asciiz "0x"
 .text
 	main:
 		li	$v0, 51
 		la	$a0, Message
 		syscall
+		add	$s0, $zero, $a0
 		nop
 		jal	convert_powerOfInput
-		add	$s0, $zero, $v0
-		nop
-		jal	convert_squared
 		add	$s1, $zero, $v0
 		nop
+		jal	convert_squared
+		add	$s2, $zero, $v0
+		nop
 		jal	convert_hex
-		nop  		
+		nop
+		jal	print_table
+		nop 		
 		li	$v0, 10
 		syscall
 	endmain:
@@ -55,7 +61,88 @@ done_squared:
 # return $v0 the address of the array storing hexa value in string type
 #--------------------------------------------------------------------	
 convert_hex:
-	li	$v0, 34
-	syscall
+	la	$t0, hex_result
+	addi	$t0, $t0, 2
+	la	$t1, digit	
+	li	$t2, 8			# total loops
+	
+	loop_hex:
+		beq	$t2, $zero, end_loop_hex
+		
+		andi	$t3, $a0, 0xf			# retrieve LSB
+		add	$t0, $t0, $t2			# byte-saving address
+		
+		add	$t1, $t1, $t3			# digit address
+		lb	$t3, 0($t1)			# retrieve digit element
+		la	$t1, digit			
+		
+		sb	$t3, 0($t0)
+		la	$t0, hex_result
+		addi	$t0, $t0, 2
+		addi	$t2, $t2, -1
+		j	check_zer
+		
+		j	loop_hex
+	end_loop_hex:
+		la	$v0, hex_result
 done_hex:
+	jr	$ra
+	
+#--------------------------------------------------------------------
+# function print_table
+# param[in] $a0
+# return table
+#--------------------------------------------------------------------
+print_table:
+	la	$a0, Title
+	li	$v0, 4
+	syscall
+	
+	nop
+	add	$a0, $zero, $s0
+	li	$v0, 1
+	syscall
+	
+	nop
+	la	$a0, space
+	li	$v0, 4
+	syscall
+	
+	nop
+	add	$a0, $zero, $s1
+	li	$v0, 1
+	syscall
+	
+	nop
+	la	$a0, space
+	li	$v0, 4
+	syscall
+	
+	nop
+	la	$a0, space
+	li	$v0, 4
+	syscall
+	
+	nop
+	add	$a0, $zero, $s2
+	li	$v0, 1
+	syscall
+	
+	nop
+	la	$a0, space
+	li	$v0, 4
+	syscall
+	
+	nop
+	la	$a0, space
+	li	$v0, 4
+	syscall
+	
+	nop
+	la	$a0, hex_result
+	li	$v0, 4
+	syscall
+	
+	
+done_print_table:
 	jr	$ra
