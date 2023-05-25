@@ -18,7 +18,16 @@
 		add	$s2, $zero, $v0
 		nop
 		jal	convert_hex
+		add	$s3, $zero, $v0
 		nop
+		
+		la	$a0, Title
+		li	$v0, 4
+		syscall
+		add	$a0, $zero, $s0
+		add	$a1, $zero, $s1
+		add	$a2, $zero, $s2
+		add	$a3, $zero, $s3
 		jal	print_table
 		nop 		
 		li	$v0, 10
@@ -67,39 +76,40 @@ convert_hex:
 	li	$t2, 8			# total loops
 	
 	loop_hex:
-		beq	$t2, $zero, end_loop_hex
-		
 		andi	$t3, $a0, 0xf			# retrieve LSB
-		add	$t0, $t0, $t2			# byte-saving address
+		add	$t4, $t0, $t2			# byte-saving address
 		
-		add	$t1, $t1, $t3			# digit address
-		lb	$t3, 0($t1)			# retrieve digit element
-		la	$t1, digit			
-		
-		sb	$t3, 0($t0)
-		la	$t0, hex_result
-		addi	$t0, $t0, 2
+		add	$t5, $t1, $t3			# digit address
+		lb	$t3, 0($t5)			# retrieve digit element	
+		sb	$t3, 0($t4)
 		addi	$t2, $t2, -1
-		j	check_zer
-		
+		srl	$a0, $a0, 4
+		beq	$a0, $zero, get_hex
 		j	loop_hex
+	get_hex:
+		add	$v0, $zero, $t4
+		addi	$v0, $v0, -1
+		
+		addi	$t0, $zero, 120
+		sb	$t0, 0($v0)
+		
+		addi	$v0, $v0, -1
+		addi	$t0, $zero, 48
+		sb	$t0, 0($v0)
+		
 	end_loop_hex:
-		la	$v0, hex_result
 done_hex:
 	jr	$ra
 	
 #--------------------------------------------------------------------
 # function print_table
-# param[in] $a0
+# param[in] $a0 i
+# param[in] $a1 2^i
+# param[in] $a2 i squared
+# param[in] $a3 hexa value of i
 # return table
 #--------------------------------------------------------------------
 print_table:
-	la	$a0, Title
-	li	$v0, 4
-	syscall
-	
-	nop
-	add	$a0, $zero, $s0
 	li	$v0, 1
 	syscall
 	
@@ -139,7 +149,7 @@ print_table:
 	syscall
 	
 	nop
-	la	$a0, hex_result
+	add	$a0, $zero, $s3
 	li	$v0, 4
 	syscall
 	
