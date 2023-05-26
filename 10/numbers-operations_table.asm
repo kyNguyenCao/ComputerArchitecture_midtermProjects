@@ -1,6 +1,6 @@
 .data
 	Message:	.asciiz	"Nhap so nguyen:"
-	Title:		.asciiz "i	power(2,i)	square(i)	Hexadecimal(i)\n"
+	Title:		.asciiz "\ni	power(2,i)	square(i)	Hexadecimal(i)\n"
 	space:		.asciiz "	"
 	digit:		.asciiz "0123456789ABCDEF"
 	hex_result:	.asciiz "0x"
